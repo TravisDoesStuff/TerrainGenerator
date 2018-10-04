@@ -1,17 +1,38 @@
 const DIMENSIONS = 500;
 
+var seaLevel = 100;
+var sandLevel = seaLevel+10;
+const GREEN_LEVEL = 170;
+const MOUNTAIN_LEVEL = 220;
+const ICE_LEVEL = 256;
+
 var cood = [];
 for(var i=0; i<DIMENSIONS; i++){
-  cood[i] = [];
-  for(var j=0; j<DIMENSIONS; j++){
-    cood[i][j] = 0;
-  }
+	cood[i] = [];
+	for(var j=0; j<DIMENSIONS; j++){
+		cood[i][j] = 0;
+	}
 }
 
 initialize();
 draw();
 
-function initialize(){
+function generateTerrain() {
+	clear();
+	initialize();
+	draw();
+}
+
+function clear() {
+	for(var i=0; i<DIMENSIONS; i++){
+		cood[i] = [];
+		for(var j=0; j<DIMENSIONS; j++){
+			cood[i][j] = 0;
+		}
+	}
+}
+
+function initialize() {
 	var minX = minY = 0;
 	var maxX = maxY = DIMENSIONS-1;
 	cood[minX][minY] = Math.floor(Math.random()*256);
@@ -22,7 +43,7 @@ function initialize(){
 	generate(minX,maxX,minY,maxY);
 }
 
-function generate(minX,maxX,minY,maxY){
+function generate(minX,maxX,minY,maxY) {
 	var midX = Math.floor((maxX+minX) / 2);
 	var midY = Math.floor((maxY+minY) / 2);
 
@@ -59,7 +80,7 @@ function generate(minX,maxX,minY,maxY){
 	generate(midX,maxX,midY,maxY);
 }
 
-function diamond(lead, tail, middle){
+function diamond(lead, tail, middle) {
 	var zAvg = Math.round((lead + tail + middle) / 3);
 
 	var maximum = Math.max(lead,tail,middle);
@@ -71,36 +92,41 @@ function diamond(lead, tail, middle){
 	return Math.round(zAvg + (deviation - (zRange/2)));
 }
 
-function draw(){
+function draw(showColor=true) {
     var map = document.getElementById('map');
     var ctx = map.getContext("2d");
 
+	ctx.clearRect(0, 0, map.width, map.height);
+
     for(var x=0; x<cood.length; x++){
         for(var y=0; y<cood.length; y++){
-            var height = cood[x][y];
+			var height = cood[x][y];
+			
+			let r = height;
+			let g = height;
+			let b = height;
 
-            var color = "rgb("+height+","+height+","+height+")";
-            if(height <= 100) { // water
-                let r = 0;
-                let g = 50 + height;
-                let b = 80 + height;
-                color= "rgb("+r+","+g+","+b+")";
-            } else if(height > 100 && height <= 110) { // sand
-                let r = 130 + height;
-                let g = 100 + height;
-                let b = 30 + height;
-                color= "rgb("+r+","+g+","+b+")";
-            } else if(height > 110 && height <= 170) { // forest
-                let r = 256 - height*1.5;
-                let g = 256 - height;
-                let b = 256 - height*1.5;
-                color= "rgb("+r+","+g+","+b+")";
-            } else if(height > 170 && height <= 220) { // mountain
-                let r = height-100;
-                let g = height-120;
-                let b = height-130;
-                color= "rgb("+r+","+g+","+b+")";
-            }
+			if(showColor) {
+				if(height <= seaLevel) {
+					r = 0;
+					g = 50 + height;
+					b = 80 + height;
+				} else if(height > seaLevel && height <= sandLevel) {
+					r = 130 + height;
+					g = 100 + height;
+					b = 30 + height;
+				} else if(height > sandLevel && height <= GREEN_LEVEL) {
+					r = height*1.2 - 100;
+					g = height*1.2-30;
+					b = height-50;
+				} else if(height > GREEN_LEVEL && height <= MOUNTAIN_LEVEL) {
+					r = height-100;
+					g = height-120;
+					b = height-130;
+				}
+			}
+
+			color= "rgb("+r+","+g+","+b+")";
 
             if(cood[x][y] != 0){
                 ctx.beginPath();
@@ -110,4 +136,18 @@ function draw(){
             }
         }
     }
+}
+
+function toggleColor() {
+	let isColor = document.getElementById('showColor').checked;
+	draw(isColor);
+}
+
+function updateWaterLevel(waterLevel) {
+	document.getElementById('seaLevelValue').innerHTML = waterLevel;
+}
+
+function globalWarming(waterLevel) {
+	seaLevel = waterLevel;
+	draw();
 }

@@ -1,9 +1,25 @@
 <html>
 	<head>
-		<title>Map Creator</title>
+		<title>Map Generator</title>
+		<link rel="stylesheet" href="styles.css">
 	</head>
 	<body>
-		<canvas id="map" width="500" height="500" style="position: absolute;"></canvas>
+		<canvas id="map" width="500" height="500"></canvas>
+
+		<div id="mapControls">
+			<div class="mapControl">
+				<label for="showColor">Show Color</label>
+				<input type="checkbox" id="showColor" name="showColor" onchange="toggleColor();" checked />
+			</div>
+	
+			<div class="mapControl">
+				<label for="seaLevel">Sea Level</label>
+				<input type="range" id="seaLevel" name="seaLevel" min="0" max="256" value="100" oninput="updateWaterLevel(this.value)" onchange="updateWaterLevel(this.value)" onmouseup="globalWarming(this.value)" />
+				<span id="seaLevelValue">100</span>
+			</div>
+	
+			<button id="generateButton" name='generateButton' onclick="generateTerrain()">Generate</button>
+		</div>
 	</body>
 	<script src='generator.js'></script>
 </html>
