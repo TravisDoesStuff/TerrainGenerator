@@ -1,4 +1,4 @@
-const DIMENSIONS = 500;
+const DIMENSIONS = 99;
 
 var seaLevel = 100;
 var sandLevel = seaLevel+10;
@@ -6,16 +6,12 @@ const GREEN_LEVEL = 170;
 const MOUNTAIN_LEVEL = 220;
 const ICE_LEVEL = 256;
 
+var bigMap = [];
 var cood = [];
-for(var i=0; i<DIMENSIONS; i++){
-	cood[i] = [];
-	for(var j=0; j<DIMENSIONS; j++){
-		cood[i][j] = 0;
-	}
-}
 
-initialize();
+initialize(0,DIMENSIONS-1);
 draw();
+
 
 function generateTerrain() {
 	clear();
@@ -27,20 +23,29 @@ function clear() {
 	for(var i=0; i<DIMENSIONS; i++){
 		cood[i] = [];
 		for(var j=0; j<DIMENSIONS; j++){
-			cood[i][j] = 0;
+			cood[i][j] = -1;
 		}
 	}
 }
 
-function initialize() {
-	var minX = minY = 0;
-	var maxX = maxY = DIMENSIONS-1;
-	cood[minX][minY] = Math.floor(Math.random()*256);
-	cood[minX][maxY] = Math.floor(Math.random()*256);
-	cood[maxX][minY] = Math.floor(Math.random()*256);
-	cood[maxX][maxY] = Math.floor(Math.random()*256);
+function initialize(topLeft, bottomRight) {
+	// set all cood to 0
+	for(var i=0; i<DIMENSIONS; i++){
+		cood[i] = [];
+		for(var j=0; j<DIMENSIONS; j++){
+			cood[i][j] = 0;
+		}
+	}
+
+	let minX = minY = topLeft;
+	let maxX = maxY = bottomRight;
+	cood[minX][minY] = Math.floor(Math.random()*256); //top left
+	cood[minX][maxY] = Math.floor(Math.random()*256); //bottom left
+	cood[maxX][minY] = Math.floor(Math.random()*256); //top right
+	cood[maxX][maxY] = Math.floor(Math.random()*256); //bottom right
 
 	generate(minX,maxX,minY,maxY);
+	bigMap.push(cood);
 }
 
 function generate(minX,maxX,minY,maxY) {
@@ -93,13 +98,13 @@ function diamond(lead, tail, middle) {
 }
 
 function draw(showColor=true) {
-    var map = document.getElementById('map');
-    var ctx = map.getContext("2d");
+  var map = document.getElementById('map01');
+  var ctx = map.getContext("2d");
 
 	ctx.clearRect(0, 0, map.width, map.height);
 
-    for(var x=0; x<cood.length; x++){
-        for(var y=0; y<cood.length; y++){
+	for(var x=0; x<cood.length; x++){
+		for(var y=0; y<cood.length; y++){
 			var height = cood[x][y];
 			
 			let r = height;
@@ -128,14 +133,14 @@ function draw(showColor=true) {
 
 			color= "rgb("+r+","+g+","+b+")";
 
-            if(cood[x][y] != 0){
-                ctx.beginPath();
-                ctx.fillRect(x,y,1,1);
-                ctx.fillStyle=color;
-                ctx.stroke();
-            }
-        }
-    }
+			if(cood[x][y] != 0){
+				ctx.beginPath();
+				ctx.fillRect(x,y,1,1);
+				ctx.fillStyle=color;
+				ctx.stroke();
+			}
+		}
+  }
 }
 
 function toggleColor() {
